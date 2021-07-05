@@ -9,11 +9,9 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class field extends Rounds
 {
     
-    private static String[] spielFeld = {" ", " ", " ", " ", " ", " ", " ", " ", " "};
-    private static String[] spieler = {"X", "O"}; // Spieler 1, Spieler 2 (Spieler 2 ist Computer wenn eingeschaltet)
-    private static boolean[] klickbar = {true, false}; // Ob Spieler 1, Spieler 2 setzen kann
-    private static boolean computer = true; // Einspieler/Zweispielermodus
-    private static int level = 3; //Schwierigkeitstufe
+    
+    // private World world = getWorldOfType(World.class);
+    
     /**
      * Act - do whatever the field wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
@@ -28,50 +26,61 @@ public class field extends Rounds
      */
     public void place()
     {
-        if (Greenfoot.mouseClicked(this) && freieZüge(spielFeld) == true && überprüfeErgebnis(spielFeld) == "-"){
-            if (klickbar[0] == true) {
+        if (Greenfoot.mouseClicked(this) && freieZüge(((MyWorld)getWorld()).spielFeld) == true && überprüfeErgebnis(((MyWorld)getWorld()).spielFeld) == "-"){
+            if (((MyWorld)getWorld()).klickbar[0] == true) {
                 int[] koordinaten = {getX(), getY()};
-                figurSetzen(spieler[0], koordinatenZuIndex(koordinaten));
+                figurSetzen(((MyWorld)getWorld()).spieler[0], koordinatenZuIndex(koordinaten));
             }
-            if (klickbar[1] == true) {
+            if (((MyWorld)getWorld()).klickbar[1] == true) {
                 int[] koordinaten = {getX(), getY()};
-                figurSetzen(spieler[1], koordinatenZuIndex(koordinaten));
+                figurSetzen(((MyWorld)getWorld()).spieler[1], koordinatenZuIndex(koordinaten));
             }
-            if (computer == false) {
-                if (klickbar[0] == true) {
-                    klickbar[0] = false;
-                    klickbar[1] = true;
+            if (((MyWorld)getWorld()).computer == false) {
+                if (((MyWorld)getWorld()).klickbar[0] == true) {
+                    ((MyWorld)getWorld()).klickbar[0] = false;
+                    ((MyWorld)getWorld()).klickbar[1] = true;
                 } else {
-                    if (klickbar[1] == true) {
-                        klickbar[0] = true;
-                        klickbar[1] = false;
+                    if (((MyWorld)getWorld()).klickbar[1] == true) {
+                        ((MyWorld)getWorld()).klickbar[0] = true;
+                        ((MyWorld)getWorld()).klickbar[1] = false;
                     }
                 }
             }
-            überprüfeErgebnis(spielFeld);
-            if (computer == true && freieZüge(spielFeld) == true && überprüfeErgebnis(spielFeld) == "-") {
-                klickbar[0] = true;
-                klickbar[1] = false;
-                if (level == 1) {
+            überprüfeErgebnis(((MyWorld)getWorld()).spielFeld);
+            if (((MyWorld)getWorld()).computer == true && freieZüge(((MyWorld)getWorld()).spielFeld) == true && überprüfeErgebnis(((MyWorld)getWorld()).spielFeld) == "-") {
+                ((MyWorld)getWorld()).klickbar[0] = true;
+                ((MyWorld)getWorld()).klickbar[1] = false;
+                if (((MyWorld)getWorld()).level == 1) {
                     int[] freiePositionen = freiePositionen();
                     int zufälligesFreiesFeld = freiePositionen[(int)(Math.random() * freiePositionen.length)];
-                    figurSetzen(spieler[1], zufälligesFreiesFeld);
+                    figurSetzen(((MyWorld)getWorld()).spieler[1], zufälligesFreiesFeld);
                 }
-                if (level == 3) {
-                    int besterZug = findeBestenZug(spielFeld);
+                if (((MyWorld)getWorld()).level == 3) {
+                    int besterZug = findeBestenZug(((MyWorld)getWorld()).spielFeld);
                     System.out.println("ZUG: " + besterZug);
-                    figurSetzen(spieler[1], besterZug);
+                    figurSetzen(((MyWorld)getWorld()).spieler[1], besterZug);
                 }
-                überprüfeErgebnis(spielFeld);
+                überprüfeErgebnis(((MyWorld)getWorld()).spielFeld);
             }
         }
     }
     
-    private static int[] freiePositionen() {
+    private void reset()
+    {
+        System.out.println("RESET");
+        for (int i = 0; i < ((MyWorld)getWorld()).spielFeld.length; i++){
+            ((MyWorld)getWorld()).spielFeld[i] = " "; // https://www.greenfoot.org/topics/63215/0
+        }
+        ((MyWorld)getWorld()).removeObjects(((MyWorld)getWorld()).getObjects(Kreis.class)); // https://www.greenfoot.org/topics/61014/0
+        ((MyWorld)getWorld()).removeObjects(((MyWorld)getWorld()).getObjects(Kreuz.class));
+    }
+    
+    
+    private int[] freiePositionen() {
         int[] freiePositionen = new int[9];
         int counter = 0;
-        for (int i = 0; i < spielFeld.length; i++) {
-            if (spielFeld[i] != "X" && spielFeld[i] != "O" ) {
+        for (int i = 0; i < ((MyWorld)getWorld()).spielFeld.length; i++) {
+            if (((MyWorld)getWorld()).spielFeld[i] != "X" && ((MyWorld)getWorld()).spielFeld[i] != "O" ) {
                 int[] feld = zuFeldHinzufügen(i - counter, freiePositionen, i);
                 freiePositionen = feld;
             } else {
@@ -81,7 +90,7 @@ public class field extends Rounds
         return freiePositionen;
     }
     
-    private static int[] zuFeldHinzufügen(int n, int feld[], int x) {
+    private int[] zuFeldHinzufügen(int n, int feld[], int x) {
         int i;
         int newfeld[] = new int[n + 1];
         for (i = 0; i < n; i++) {
@@ -91,12 +100,12 @@ public class field extends Rounds
         return newfeld;
     }
     
-    private static int koordinatenZuIndex(int[] koordinaten) {
+    private int koordinatenZuIndex(int[] koordinaten) {
         int ergebnis = (((koordinaten[0] + 1) * 1 + (koordinaten[1] * 3)) - 1);
         return ergebnis;
     }
 
-    private static int[] indexZuKoordinaten(int index) {
+    private int[] indexZuKoordinaten(int index) {
         int[] ergebnis = new int[2];
         ergebnis[0] = index;
         if (index > -1 && index < 3) {
@@ -115,98 +124,101 @@ public class field extends Rounds
     
     /* Fragt nach Feld und setzt aktuelle Figur dort hin. */
     private void figurSetzen(String figur, int position) {
-        spielFeld[position] = figur;
+        ((MyWorld)getWorld()).spielFeld[position] = figur;
         if (figur == "X") {
             getWorld().addObject(new Kreuz(), indexZuKoordinaten(position)[0], indexZuKoordinaten(position)[1]);
         }
         if (figur == "O") {
             getWorld().addObject(new Kreis(), indexZuKoordinaten(position)[0], indexZuKoordinaten(position)[1]);
         }
-        System.out.println("\n" + spielFeld[0] + " | " + spielFeld[1] + " | " + spielFeld[2] + "\n---------\n" + spielFeld[3] + " | " + spielFeld[4] + " | " + spielFeld[5] + "\n---------\n" + spielFeld[6] + " | " + spielFeld[7] + " | " + spielFeld[8] + "\n");
+        System.out.println("\n" + ((MyWorld)getWorld()).spielFeld[0] + " | " + ((MyWorld)getWorld()).spielFeld[1] + " | " + ((MyWorld)getWorld()).spielFeld[2] + "\n---------\n" + ((MyWorld)getWorld()).spielFeld[3] + " | " + ((MyWorld)getWorld()).spielFeld[4] + " | " + ((MyWorld)getWorld()).spielFeld[5] + "\n---------\n" + ((MyWorld)getWorld()).spielFeld[6] + " | " + ((MyWorld)getWorld()).spielFeld[7] + " | " + ((MyWorld)getWorld()).spielFeld[8] + "\n");
     }
     
-    static Boolean freieZüge(String spielFeld[])
+    Boolean freieZüge(String spielFeld[])
     {
         for (int i = 0; i < 9; i++) {
-            if (spielFeld[i] == " ") {
+            if (((MyWorld)getWorld()).spielFeld[i] == " ") {
                 return true;
             }
         }
         return false;
     }
     
-    private static String überprüfeErgebnis(String[] spielFeld) {
+    private String überprüfeErgebnis(String[] spielFeld) {
         String ergebnis = "-";
         String spielFigur = "X";
         for (int i = 0; i < 2; i++) {
-            if (spielFeld[0] == spielFigur && spielFeld[1] == spielFigur && spielFeld[2] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[0] == spielFigur && ((MyWorld)getWorld()).spielFeld[1] == spielFigur && ((MyWorld)getWorld()).spielFeld[2] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {0, 1, 2};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[3] == spielFigur && spielFeld[4] == spielFigur && spielFeld[5] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[3] == spielFigur && ((MyWorld)getWorld()).spielFeld[4] == spielFigur && ((MyWorld)getWorld()).spielFeld[5] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {3, 4, 5};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[6] == spielFigur && spielFeld[7] == spielFigur && spielFeld[8] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[6] == spielFigur && ((MyWorld)getWorld()).spielFeld[7] == spielFigur && ((MyWorld)getWorld()).spielFeld[8] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {6, 7, 8};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[0] == spielFigur && spielFeld[3] == spielFigur && spielFeld[6] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[0] == spielFigur && ((MyWorld)getWorld()).spielFeld[3] == spielFigur && ((MyWorld)getWorld()).spielFeld[6] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {0, 3, 6};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[1] == spielFigur && spielFeld[4] == spielFigur && spielFeld[7] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[1] == spielFigur && ((MyWorld)getWorld()).spielFeld[4] == spielFigur && ((MyWorld)getWorld()).spielFeld[7] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {1, 4, 7};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[2] == spielFigur && spielFeld[5] == spielFigur && spielFeld[8] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[2] == spielFigur && ((MyWorld)getWorld()).spielFeld[5] == spielFigur && ((MyWorld)getWorld()).spielFeld[8] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {2, 5, 8};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[8] == spielFigur && spielFeld[4] == spielFigur && spielFeld[0] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[8] == spielFigur && ((MyWorld)getWorld()).spielFeld[4] == spielFigur && ((MyWorld)getWorld()).spielFeld[0] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {8, 4, 0};
                 ergebnisSpielfeld(gewinnPosition);
             }
-            if (spielFeld[2] == spielFigur && spielFeld[4] == spielFigur && spielFeld[6] == spielFigur) {
+            if (((MyWorld)getWorld()).spielFeld[2] == spielFigur && ((MyWorld)getWorld()).spielFeld[4] == spielFigur && ((MyWorld)getWorld()).spielFeld[6] == spielFigur) {
                 ergebnis = spielFigur;
                 int[] gewinnPosition = {2, 4, 6};
                 ergebnisSpielfeld(gewinnPosition);
             }
             spielFigur = "O";
         }
-        if (ergebnis == "-" && freieZüge(spielFeld) == false) {
+        if (ergebnis == "-" && freieZüge(((MyWorld)getWorld()).spielFeld) == false) {
             System.out.println("ERGEBNIS: Unentschieden");
-            klickbar[0] = false;
-            klickbar[1] = false;
+            ((MyWorld)getWorld()).klickbar[0] = false;
+            ((MyWorld)getWorld()).klickbar[1] = false;
+            reset();
         }
         if (ergebnis == "X") {
             System.out.println("ERGEBNIS: Kreuz hat gewonnen");
-            klickbar[0] = false;
-            klickbar[1] = false;
+            ((MyWorld)getWorld()).klickbar[0] = false;
+            ((MyWorld)getWorld()).klickbar[1] = false;
+            reset();
         }
         if (ergebnis == "O") {
             System.out.println("ERGEBNIS: Kreis hat gewonnen");
-            klickbar[0] = false;
-            klickbar[1] = false;
+            ((MyWorld)getWorld()).klickbar[0] = false;
+            ((MyWorld)getWorld()).klickbar[1] = false;
+            reset();
         }
         return ergebnis; 
     }
     
-    private static void ergebnisSpielfeld(int[] gewinnPosition) {
+    private void ergebnisSpielfeld(int[] gewinnPosition) {
         String[] gewinnSpielFeld = new String[9];
-        gewinnSpielFeld = spielFeld;
+        gewinnSpielFeld = ((MyWorld)getWorld()).spielFeld;
         entmarkieren(gewinnSpielFeld);
         System.out.println("\nERGEBNIS\n\n" + markieren(gewinnPosition, gewinnSpielFeld)[0] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[1] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[2] + "\n---------\n" + markieren(gewinnPosition, gewinnSpielFeld)[3] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[4] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[5] + "\n---------\n" + markieren(gewinnPosition, gewinnSpielFeld)[6] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[7] + " | " + markieren(gewinnPosition, gewinnSpielFeld)[8] + "\n");
     }
     
-    private static String[] markieren(int[] gewinnPosition, String[] gewinnSpielFeld) {
+    private String[] markieren(int[] gewinnPosition, String[] gewinnSpielFeld) {
         for (int i = 0; i < gewinnPosition.length; i++) {
             String spielFigur = gewinnSpielFeld[gewinnPosition[i]];
             if (spielFigur == "x") {
@@ -219,9 +231,9 @@ public class field extends Rounds
         return gewinnSpielFeld;
     }
 
-    private static void entmarkieren(String[] gewinnSpielFeld) {
+    private void entmarkieren(String[] gewinnSpielFeld) {
         for (int i = 0; i < gewinnSpielFeld.length; i++) {
-            String spielFigur = spielFeld[i];
+            String spielFigur = ((MyWorld)getWorld()).spielFeld[i];
             if (spielFigur == "X") {
                 gewinnSpielFeld[i] = "x";
             }
@@ -233,77 +245,77 @@ public class field extends Rounds
     
     /* MINIMAX START */
     
-    static int evaluate(String[] spielFeld)
+    int evaluate(String[] spielFeld)
     {
-        if (spielFeld[0] == spielFeld[1] && spielFeld[1] == spielFeld[2]) {
-            if (spielFeld[0] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spielFeld[1] && ((MyWorld)getWorld()).spielFeld[1] == ((MyWorld)getWorld()).spielFeld[2]) {
+            if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[0] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[3] == spielFeld[4] && spielFeld[4] == spielFeld[5]) {
-            if (spielFeld[3] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[3] == ((MyWorld)getWorld()).spielFeld[4] && ((MyWorld)getWorld()).spielFeld[4] == ((MyWorld)getWorld()).spielFeld[5]) {
+            if (((MyWorld)getWorld()).spielFeld[3] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[3] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[3] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[6] == spielFeld[7] && spielFeld[7] == spielFeld[8]) {
-            if (spielFeld[6] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[6] == ((MyWorld)getWorld()).spielFeld[7] && ((MyWorld)getWorld()).spielFeld[7] == ((MyWorld)getWorld()).spielFeld[8]) {
+            if (((MyWorld)getWorld()).spielFeld[6] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[6] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[6] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[0] == spielFeld[3] && spielFeld[3] == spielFeld[6]) {
-            if (spielFeld[0] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spielFeld[3] && ((MyWorld)getWorld()).spielFeld[3] == ((MyWorld)getWorld()).spielFeld[6]) {
+            if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[0] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[1] == spielFeld[4] && spielFeld[4] == spielFeld[7]) {
-            if (spielFeld[1] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[1] == ((MyWorld)getWorld()).spielFeld[4] && ((MyWorld)getWorld()).spielFeld[4] == ((MyWorld)getWorld()).spielFeld[7]) {
+            if (((MyWorld)getWorld()).spielFeld[1] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[1] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[1] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[2] == spielFeld[5] && spielFeld[5] == spielFeld[8]) {
-            if (spielFeld[2] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spielFeld[5] && ((MyWorld)getWorld()).spielFeld[5] == ((MyWorld)getWorld()).spielFeld[8]) {
+            if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[2] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[0] == spielFeld[4] && spielFeld[4] == spielFeld[8]) {
-            if (spielFeld[0] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spielFeld[4] && ((MyWorld)getWorld()).spielFeld[4] == ((MyWorld)getWorld()).spielFeld[8]) {
+            if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[0] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[0] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
-        if (spielFeld[2] == spielFeld[4] && spielFeld[4] == spielFeld[6]) {
-            if (spielFeld[2] == spieler[1])
+        if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spielFeld[4] && ((MyWorld)getWorld()).spielFeld[4] == ((MyWorld)getWorld()).spielFeld[6]) {
+            if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spieler[1])
                     return +10;
-                else if (spielFeld[2] == spieler[0])
+                else if (((MyWorld)getWorld()).spielFeld[2] == ((MyWorld)getWorld()).spieler[0])
                     return -10;
         }
         return 0;
     }
     
-    static int minimax(String spielFeld[], int tiefe, Boolean istMaximal) {
-        int score = evaluate(spielFeld);
+    int minimax(String spielFeld[], int tiefe, Boolean istMaximal) {
+        int score = evaluate(((MyWorld)getWorld()).spielFeld);
         if (score == 10)
             return score;
         if (score == -10)
             return score;
-        if (freieZüge(spielFeld) == false)
+        if (freieZüge(((MyWorld)getWorld()).spielFeld) == false)
             return 0;
         if (istMaximal)
         {
             int best = -1000;
             for (int i = 0; i < 9; i++)
             {
-                if (spielFeld[i]==" ")
+                if (((MyWorld)getWorld()).spielFeld[i]==" ")
                 {
-                    spielFeld[i] = spieler[1];
-                    best = Math.max(best, minimax(spielFeld, tiefe + 1, !istMaximal));
-                    spielFeld[i] = " ";
+                    ((MyWorld)getWorld()).spielFeld[i] = ((MyWorld)getWorld()).spieler[1];
+                    best = Math.max(best, minimax(((MyWorld)getWorld()).spielFeld, tiefe + 1, !istMaximal));
+                    ((MyWorld)getWorld()).spielFeld[i] = " ";
                 }
             }
             return best;
@@ -313,11 +325,11 @@ public class field extends Rounds
             int best = 1000;
             for (int i = 0; i < 9; i++)
             {
-                if (spielFeld[i] == " ")
+                if (((MyWorld)getWorld()).spielFeld[i] == " ")
                 {
-                    spielFeld[i] = spieler[0];
-                    best = Math.min(best, minimax(spielFeld, tiefe + 1, !istMaximal));
-                    spielFeld[i] = " ";
+                    ((MyWorld)getWorld()).spielFeld[i] = ((MyWorld)getWorld()).spieler[0];
+                    best = Math.min(best, minimax(((MyWorld)getWorld()).spielFeld, tiefe + 1, !istMaximal));
+                    ((MyWorld)getWorld()).spielFeld[i] = " ";
                 }
                 
             }
@@ -325,17 +337,17 @@ public class field extends Rounds
         }
     }
     
-    static int findeBestenZug(String spielFeld[])
+    int findeBestenZug(String spielFeld[])
     {
         int besterWert = -1000;
         int besterZug = 0;
         for (int i = 0; i < 9; i++)
         {
-            if (spielFeld[i] == " ")
+            if (((MyWorld)getWorld()).spielFeld[i] == " ")
             {
-                spielFeld[i] = spieler[1];
-                int zugWert = minimax(spielFeld, 0, false);
-                spielFeld[i] = " ";
+                ((MyWorld)getWorld()).spielFeld[i] = ((MyWorld)getWorld()).spieler[1];
+                int zugWert = minimax(((MyWorld)getWorld()).spielFeld, 0, false);
+                ((MyWorld)getWorld()).spielFeld[i] = " ";
                 if (zugWert > besterWert)
                 {
                     besterZug = i;
