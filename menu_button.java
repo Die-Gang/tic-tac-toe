@@ -15,7 +15,8 @@ public class menu_button extends menuObjects
     public void act() 
     {
         if (Greenfoot.mouseClicked(this)) {
-            System.out.println("EINSPIELER PRESSED");
+            System.out.println("MENU PRESSED");
+            ((field)getWorld().getObjects(field.class).get(0)).reset();
             menu m = new menu();
             Greenfoot.setWorld(m);
         }
