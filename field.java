@@ -32,6 +32,10 @@
                     int[] koordinaten = {getX(), getY()};
                     figurSetzen(((MyWorld) getWorld()).spieler[1], koordinatenZuIndex(koordinaten));
                 }
+                if (((MyWorld) getWorld()).computer == false && ((MyWorld) getWorld()).klickbar[0] == false && ((MyWorld) getWorld()).klickbar[1] == false){
+                    ((MyWorld) getWorld()).klickbar[0] = false;
+                    ((MyWorld) getWorld()).klickbar[1] = true;
+                }
                 if (((MyWorld) getWorld()).computer == false) {
                     if (((MyWorld) getWorld()).klickbar[0] == true) {
                         ((MyWorld) getWorld()).klickbar[0] = false;
@@ -72,7 +76,6 @@
             ((MyWorld) getWorld()).removeObjects(((MyWorld) getWorld()).getObjects(Kreis.class)); // https://www.greenfoot.org/topics/61014/0
             ((MyWorld) getWorld()).removeObjects(((MyWorld) getWorld()).getObjects(Kreuz.class));
         }
-
 
         private int[] freiePositionen() {
             int[] freiePositionen = new int[9];

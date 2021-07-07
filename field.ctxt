@@ -1,9 +1,9 @@
 #BlueJ class context
 comment0.target=field
-comment0.text=\n\ Write\ a\ description\ of\ class\ field\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment0.text=\r\n\ Write\ a\ description\ of\ class\ field\ here.\r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
 comment1.params=
 comment1.target=void\ act()
-comment1.text=\n\ Act\ -\ do\ whatever\ the\ field\ wants\ to\ do.\ This\ method\ is\ called\ whenever\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\n
+comment1.text=\r\n\ Act\ -\ do\ whatever\ the\ field\ wants\ to\ do.\ This\ method\ is\ called\ whenever\r\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\r\n
 comment10.params=spielFeld
 comment10.target=java.lang.String\ \u00FCberpr\u00FCfeErgebnis(java.lang.String[])
 comment11.params=gewinnPosition
@@ -23,7 +23,7 @@ comment17.params=spielFeld
 comment17.target=int\ findeBestenZug(java.lang.String[])
 comment2.params=
 comment2.target=void\ place()
-comment2.text=\n\ \n
+comment2.text=\r\n\ \r\n
 comment3.params=
 comment3.target=void\ reset()
 comment4.params=
