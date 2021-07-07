@@ -1,2 +1,3 @@
-# tic-tac-toe
+# Tic Tac Toe Project
+*Made with Greenfoot*
  
